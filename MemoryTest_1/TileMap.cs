@@ -16,6 +16,8 @@ namespace MemoryTest_1
 
         public Matrix<double> buildingMap;
 
+        public int[] startPos = { 0, 0 };
+
 
         public TileMap()
         {
@@ -38,7 +40,7 @@ namespace MemoryTest_1
 
         public void updateVisibleMap(int x, int y)
         {
-            visibleMap = Matrix.Build.Dense(12, 12);
+            visibleMap = Matrix.Build.Dense(12, 12,9);
             for (int i = 0; i < 360; i++)
             {
                 for(int j = 0; j < 20; j++)

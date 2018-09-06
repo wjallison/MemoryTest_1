@@ -27,9 +27,39 @@ namespace MemoryTest_1
             {
                 m = LoadMap();
             }
+
+
+            //One way or another, we now have a map.  Now, we will choose who will solve the map.
+            Console.WriteLine("Will the solution be provided by the user? (y/n)");
+            if(Console.ReadKey().KeyChar == 'y')
+            {
+
+            }
             
 
             Console.ReadKey();
+        }
+
+        public static Solution UserSolution(TileMap m)
+        {
+            Solution solve = new Solution();
+            bool notDone = true;
+            int xPlayer = m.startPos[0];
+            int yPlayer = m.startPos[1];
+            while (notDone)
+            {
+                ConsoleKeyInfo c = Console.ReadKey();
+                switch (c.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        yPlayer--;
+                        //if(m.map)
+                }
+            }
+
+
+
+
         }
 
         public static TileMap BuildMap(TileMap m)
@@ -70,6 +100,8 @@ namespace MemoryTest_1
                         break;
                     case ConsoleKey.NumPad5:
                         m.map[yBuild, xBuild] = 6;
+                        m.startPos[0] = yBuild;
+                        m.startPos[1] = xBuild;
                         break;
                     case ConsoleKey.NumPad8:
                         m.map[yBuild, xBuild] = 8;
