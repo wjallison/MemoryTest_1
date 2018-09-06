@@ -1,0 +1,10 @@
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\bin\Debug\MemoryTest_1.exe.config
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\bin\Debug\MemoryTest_1.exe
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\bin\Debug\MemoryTest_1.pdb
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\bin\Debug\MathNet.Numerics.dll
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\bin\Debug\MathNet.Numerics.xml
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.csprojAssemblyReference.cache
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.csproj.CoreCompileInputs.cache
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.csproj.CopyComplete
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.exe
+c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.pdb
