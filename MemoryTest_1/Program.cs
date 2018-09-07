@@ -51,6 +51,7 @@ namespace MemoryTest_1
                     SaveClassicNetwork(net);
                 }
             }
+
             Console.WriteLine("Do you want to train a memory network? (y/n)");
             if(Console.ReadKey().KeyChar == 'y')
             {
@@ -67,10 +68,22 @@ namespace MemoryTest_1
                     }
                     mNet.ResetMemory();
                 }
+
+                Console.WriteLine("Would you like to test the network? (y/n)");
+                if (Console.ReadKey().KeyChar == 'y')
+                {
+                    m = LoadMap();
+
+
+                }
+
+                Console.WriteLine("Would you like to save the network? (y/n)");
+                if (Console.ReadKey().KeyChar == 'y')
+                {
+                    
+                }
             }
 
-
-            //Ask if the user wants to build a map
             Console.WriteLine("Do you want to build a map? (y/n)");
             if(Console.ReadKey().KeyChar == 'y')
             {
@@ -101,12 +114,38 @@ namespace MemoryTest_1
                     List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
 
                 }
+                else
+                {
+                    Console.WriteLine("Do you want to load a memory network? (y/n)");
+                    if(Console.ReadKey().KeyChar == 'y')
+                    {
 
+
+                    }
+                }
 
             }
             
 
             Console.ReadKey();
+        }
+        public static void SaveMemoryNetwork(MemoryNetwork net)
+        {
+            Console.WriteLine("Please enter a title:");
+            string netName = Console.ReadLine();
+
+            var csv = new StringBuilder();
+            string line;
+
+            csv.AppendLine(netName);
+            csv.AppendLine(net.numLayers.ToString());
+            for (int i = 0; i < net.weights.Count; i++)
+            {
+                //csv.AppendLine(net.weights[i].RowCount.ToString() + "," + net.weights[i].ColumnCount.ToString());
+                csv.Append(net.weights[i].ToString());
+                csv.Append(net.biases[i].ToString());
+            }
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"/mnet_" + netName + ".csv", csv.ToString());
         }
 
         public static void SaveClassicNetwork(ClassicNetwork net)
@@ -125,7 +164,7 @@ namespace MemoryTest_1
                 csv.Append(net.weights[i].ToString());
                 csv.Append(net.biases[i].ToString());
             }
-            File.WriteAllText(Directory.GetCurrentDirectory() + @"/" + netName + ".csv", csv.ToString());
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"/cnet_" + netName + ".csv", csv.ToString());
         }
 
         public static Solution ClassicProgramSolution(TileMap m, ClassicNetwork net, bool waitForGoAhead = true)
@@ -165,6 +204,64 @@ namespace MemoryTest_1
                     m.updateVisibleMap(xPlayer, yPlayer);
                 }
                 else if(action[3] == 1)
+                {
+                    solve.add(4, m.visibleMap);
+                    yPlayer--;
+                    if (m.isWall(xPlayer, yPlayer)) { yPlayer++; }
+                    m.updateVisibleMap(xPlayer, yPlayer);
+                }
+                if (m.map[xPlayer, yPlayer] == 6) { notDone = false; }
+            }
+            Console.Write(m.map.ToString());
+            solve.takenSteps = solve.actions.Count;
+            Console.WriteLine("Completed in " + solve.takenSteps + " steps.");
+            Console.WriteLine("Please enter the minimum number of steps:");
+            solve.minSteps = Convert.ToInt16(Console.ReadLine());
+            solve.CalculateScore();
+            Console.WriteLine("Score (out of 1000): " + solve.score.ToString());
+
+            solve.GetName(m);
+
+            return solve;
+        }
+
+        public static Solution MemoryProgramSolution(TileMap m, MemoryNetwork net, bool waitForGoAhead = true)
+        {
+            Solution solve = new Solution();
+
+            int xPlayer = m.startPos[0];
+            int yPlayer = m.startPos[1];
+
+            double[] action;
+            bool notDone = true;
+            while (notDone)
+            {
+                Console.Write(m.visibleMap.ToString());
+                if (waitForGoAhead) { Console.ReadKey(); }
+                action = net.Act(m);
+
+                if (action[0] == 1)
+                {
+                    solve.add(1, m.visibleMap);
+                    xPlayer--;
+                    if (m.isWall(xPlayer, yPlayer)) { xPlayer++; }
+                    m.updateVisibleMap(xPlayer, yPlayer);
+                }
+                else if (action[1] == 1)
+                {
+                    solve.add(2, m.visibleMap);
+                    xPlayer++;
+                    if (m.isWall(xPlayer, yPlayer)) { xPlayer--; }
+                    m.updateVisibleMap(xPlayer, yPlayer);
+                }
+                else if (action[2] == 1)
+                {
+                    solve.add(3, m.visibleMap);
+                    yPlayer++;
+                    if (m.isWall(xPlayer, yPlayer)) { yPlayer--; }
+                    m.updateVisibleMap(xPlayer, yPlayer);
+                }
+                else if (action[3] == 1)
                 {
                     solve.add(4, m.visibleMap);
                     yPlayer--;
