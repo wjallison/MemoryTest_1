@@ -18,6 +18,8 @@ namespace MemoryTest_1
 
         public int[] startPos = { 0, 0 };
 
+        public string name;
+
 
         public TileMap()
         {

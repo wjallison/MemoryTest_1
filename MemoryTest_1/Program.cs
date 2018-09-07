@@ -22,6 +22,8 @@ namespace MemoryTest_1
             if(Console.ReadKey().KeyChar == 'y')
             {
                 m = BuildMap(m);
+                Console.WriteLine("Please enter a title:");
+                m.name = Console.ReadLine();
                 SaveMap(m);
             }
             else
@@ -81,9 +83,14 @@ namespace MemoryTest_1
                 if(m.map[xPlayer,yPlayer] == 6) { notDone = false; }
             }
             Console.Write(m.map.ToString());
-            Console.WriteLine("Completed in " + solve.actions.Count.ToString() + " steps.");
+            solve.takenSteps = solve.actions.Count;
+            Console.WriteLine("Completed in " + solve.takenSteps + " steps.");
+            Console.WriteLine("Please enter the minimum number of steps:");
+            solve.minSteps = Convert.ToInt16(Console.ReadLine());
+            solve.CalculateScore();
+            Console.WriteLine("Score (out of 1000): " + solve.score.ToString());
 
-
+            solve.GetName(m);
 
             return solve;
         }
@@ -145,10 +152,12 @@ namespace MemoryTest_1
 
         public static void SaveMap(TileMap m)
         {
-            Console.WriteLine("Please enter a title:");
-            string name = Console.ReadLine();
+            //Console.WriteLine("Please enter a title:");
+            //string name = Console.ReadLine();
+            //m.name = name;
             var csv = new StringBuilder();
             string line;
+            csv.AppendLine(m.name);
             for(int i = 0; i < 12; i++)
             {
                 line = m.map[i, 0].ToString();
@@ -159,10 +168,9 @@ namespace MemoryTest_1
                 csv.AppendLine(line);
             }
 
-            File.WriteAllText(Directory.GetCurrentDirectory() + @"/" + name + ".csv", csv.ToString());
-
-
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"/" + m.name + ".csv", csv.ToString());
         }
+
         public static TileMap LoadMap()
         {
             TileMap m = new TileMap();
@@ -181,6 +189,7 @@ namespace MemoryTest_1
                 using(var reader = new StreamReader(files[ind].FullName))
                 {
                     int i = 0;
+                    m.name = reader.ReadLine();
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
@@ -203,6 +212,27 @@ namespace MemoryTest_1
             m.reInit();
             Console.Write(m.map.ToString());
             return m;
+        }
+
+        public static void SaveSolution(Solution s)
+        {
+            //Console.WriteLine("Please enter a title:");
+            //Console.Write(m.name);
+            //Console.ReadLine()
+            var csv = new StringBuilder();
+            string line;
+            csv.AppendLine(s.name);
+            csv.AppendLine(s.score.ToString());
+            for(int i = 0; i < s.result.Count; i++)
+            {
+                csv.AppendLine(s.result[i].output.ToString());
+                for(int j = 0; j < s.result[0].state.Count; j++)
+                {
+                    csv.AppendLine(s.result[i].state[j].ToString());
+                }
+            }
+
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"/" + s.name + ".csv", csv.ToString());
         }
     }
 }
