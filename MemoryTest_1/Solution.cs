@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using System.IO;
 
 namespace MemoryTest_1
 {
@@ -28,6 +29,26 @@ namespace MemoryTest_1
         public Solution()
         {
             //actions.Add(null);
+        }
+
+        public Solution(FileInfo f)
+        {
+            using(var reader = new StreamReader(f.FullName))
+            {
+                name = reader.ReadLine();
+                score = Convert.ToDouble(reader.ReadLine());
+                while (!reader.EndOfStream)
+                {
+                    //tempList.Add(Convert.ToDouble(reader.ReadLine()));
+                    double action = Convert.ToDouble(reader.ReadLine());
+                    List<double> tempList = new List<double>();
+                    for (int i = 0; i < 144; i++)
+                    {
+                        tempList.Add(Convert.ToDouble(reader.ReadLine()));
+                    }
+                    result.Add(new SingleTraining(tempList, action, score));
+                }
+            }
         }
 
         public void add(ConsoleKeyInfo c, Matrix<double> view)

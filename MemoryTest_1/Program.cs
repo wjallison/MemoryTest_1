@@ -15,7 +15,21 @@ namespace MemoryTest_1
         {
             //Init the map
             TileMap m = new TileMap();
+            List<Solution> trainingSolns = new List<Solution>();
             Solution solve;
+
+            Console.WriteLine("Do you want to train a classic network? (y/n)");
+            if(Console.ReadKey().KeyChar == 'y')
+            {
+                List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+                ClassicNetwork net = new ClassicNetwork(networkInit);
+
+                trainingSolns = LoadSolutions();
+                
+
+
+            }
+            
 
             //Ask if the user wants to build a map
             Console.WriteLine("Do you want to build a map? (y/n)");
@@ -30,17 +44,39 @@ namespace MemoryTest_1
             {
                 m = LoadMap();
             }
-
+            //Console.WriteLine")
 
             //One way or another, we now have a map.  Now, we will choose who will solve the map.
             Console.WriteLine("Will the solution be provided by the user? (y/n)");
             if(Console.ReadKey().KeyChar == 'y')
             {
                 solve = UserSolution(m);
+                SaveSolution(solve);
+            }
+            else
+            {
+                Console.WriteLine("Classic network? (y/n)");
+                if(Console.ReadKey().KeyChar == 'y')
+                {
+                    List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+
+                }
+
+
             }
             
 
             Console.ReadKey();
+        }
+
+        public static Solution programSolution(TileMap m, ClassicNetwork net)
+        {
+            Solution solve = new Solution();
+
+
+
+
+            return solve;
         }
 
         public static Solution UserSolution(TileMap m)
@@ -213,7 +249,50 @@ namespace MemoryTest_1
             Console.Write(m.map.ToString());
             return m;
         }
+        public static List<Solution> LoadSolutions()
+        {
+            List<Solution> ret = new List<Solution>();
 
+            DirectoryInfo dInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
+            FileInfo[] files = dInfo.GetFiles("soln_*.csv");
+            List<bool> selectedFiles = new List<bool>();
+            for(int i = 0; i < files.Length; i++) { selectedFiles.Add(false); }
+
+            Console.WriteLine("Please select solutions to use for training.");
+            for(int i = 0; i < files.Length; i++)
+            {
+                Console.WriteLine(" " + i.ToString() + ". " + files[i].Name);
+            }
+            bool notDone = true;
+            while (notDone)
+            {
+                string s = Console.ReadLine();
+                if(s == "") { notDone = false; }
+                else
+                {
+                    if (!selectedFiles[Convert.ToInt16(s)])
+                    {
+                        ret.Add(new Solution(files[Convert.ToInt16(s)]));
+                    }
+                }
+                for (int i = 0; i < files.Length; i++)
+                {
+                    if (selectedFiles[i])
+                    {
+                        Console.WriteLine("[" + i.ToString() + ".]" + files[i].Name);
+                    }
+                    else
+                    {
+                    Console.WriteLine(" " + i.ToString() + ". " + files[i].Name);
+                    }
+                }
+
+            }
+
+
+            return ret;
+        }
+        
         public static void SaveSolution(Solution s)
         {
             //Console.WriteLine("Please enter a title:");
@@ -232,7 +311,7 @@ namespace MemoryTest_1
                 }
             }
 
-            File.WriteAllText(Directory.GetCurrentDirectory() + @"/" + s.name + ".csv", csv.ToString());
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"/" + "soln_" + s.name + ".csv", csv.ToString());
         }
     }
 }
