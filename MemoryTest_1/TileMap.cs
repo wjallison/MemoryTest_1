@@ -34,8 +34,19 @@ namespace MemoryTest_1
 
 
 
-            buildingMap = map;
-            visibleMap = map;
+            buildingMap = Matrix.Build.DenseOfMatrix(map);
+            visibleMap = Matrix.Build.DenseOfMatrix(map);
+        }
+        public void reInit()
+        {
+            buildingMap = Matrix.Build.DenseOfMatrix(map);
+            visibleMap = Matrix.Build.DenseOfMatrix(map);
+        }
+
+        public bool isWall(int x, int y)
+        {
+            if(map[x,y] == 8) { return true; }
+            return false;
         }
 
         public void updateVisibleMap(int x, int y)
@@ -43,12 +54,12 @@ namespace MemoryTest_1
             visibleMap = Matrix.Build.Dense(12, 12,9);
             for (int i = 0; i < 360; i++)
             {
-                for(int j = 0; j < 20; j++)
+                for(int j = 0; j < 80; j++)
                 {
-                    int xP = x + j * Convert.ToInt16(Math.Cos(Convert.ToDouble(i) * Math.PI / 180));
-                    int yP = y + j * Convert.ToInt16(Math.Sin(Convert.ToDouble(i) * Math.PI / 180));
+                    int xP = x + Convert.ToInt16(j * .25 * Math.Cos(Convert.ToDouble(i) * Math.PI / 180));
+                    int yP = y + Convert.ToInt16(j * .25 * Math.Sin(Convert.ToDouble(i) * Math.PI / 180));
 
-                    if(map[xP,yP] != 8)
+                    if (map[xP,yP] != 8)
                     {
                         visibleMap[xP, yP] = map[xP, yP];
                     }

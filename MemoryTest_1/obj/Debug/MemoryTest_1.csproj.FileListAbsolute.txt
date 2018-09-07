@@ -8,3 +8,13 @@ c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.cspr
 c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.csproj.CopyComplete
 c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.exe
 c:\users\jack\source\repos\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.pdb
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\bin\Debug\MemoryTest_1.exe.config
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\bin\Debug\MemoryTest_1.exe
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\bin\Debug\MemoryTest_1.pdb
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\bin\Debug\MathNet.Numerics.dll
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\bin\Debug\MathNet.Numerics.xml
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.csprojAssemblyReference.cache
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.csproj.CoreCompileInputs.cache
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.csproj.CopyComplete
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.exe
+F:\LargeDownloads\Documents\GitHub\MemoryTest_1\MemoryTest_1\obj\Debug\MemoryTest_1.pdb

@@ -21,7 +21,12 @@ namespace MemoryTest_1
         public void add(ConsoleKeyInfo c, Matrix<double> view)
         {
             actions.Add(c);
-            viewStates.Add(view);
+            viewStates.Add(Matrix.Build.DenseOfMatrix(view));
+        }
+
+        public void CalculateScore()
+        {
+
         }
 
         //public double[] inputFormat()

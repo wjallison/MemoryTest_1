@@ -15,6 +15,7 @@ namespace MemoryTest_1
         {
             //Init the map
             TileMap m = new TileMap();
+            Solution solve;
 
             //Ask if the user wants to build a map
             Console.WriteLine("Do you want to build a map? (y/n)");
@@ -33,7 +34,7 @@ namespace MemoryTest_1
             Console.WriteLine("Will the solution be provided by the user? (y/n)");
             if(Console.ReadKey().KeyChar == 'y')
             {
-
+                solve = UserSolution(m);
             }
             
 
@@ -48,18 +49,43 @@ namespace MemoryTest_1
             int yPlayer = m.startPos[1];
             while (notDone)
             {
+                Console.Write(m.visibleMap.ToString());
                 ConsoleKeyInfo c = Console.ReadKey();
                 switch (c.Key)
                 {
                     case ConsoleKey.UpArrow:
+                        solve.add(c, m.visibleMap);
+                        xPlayer--;
+                        if (m.isWall(xPlayer, yPlayer)) { xPlayer++; }
+                        m.updateVisibleMap(xPlayer, yPlayer);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        solve.add(c, m.visibleMap);
+                        xPlayer++;
+                        if (m.isWall(xPlayer, yPlayer)) { xPlayer--; }
+                        m.updateVisibleMap(xPlayer, yPlayer);
+                        break;
+                    case ConsoleKey.RightArrow:
+                        solve.add(c, m.visibleMap);
+                        yPlayer++;
+                        if (m.isWall(xPlayer, yPlayer)) { yPlayer--; }
+                        m.updateVisibleMap(xPlayer, yPlayer);
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        solve.add(c, m.visibleMap);
                         yPlayer--;
-                        //if(m.map)
+                        if (m.isWall(xPlayer, yPlayer)) { yPlayer++; }
+                        m.updateVisibleMap(xPlayer, yPlayer);
+                        break;
                 }
+                if(m.map[xPlayer,yPlayer] == 6) { notDone = false; }
             }
+            Console.Write(m.map.ToString());
+            Console.WriteLine("Completed in " + solve.actions.Count.ToString() + " steps.");
 
 
 
-
+            return solve;
         }
 
         public static TileMap BuildMap(TileMap m)
@@ -97,11 +123,11 @@ namespace MemoryTest_1
                         break;
                     case ConsoleKey.NumPad0:
                         m.map[yBuild, xBuild] = 1;
+                        m.startPos[0] = yBuild;
+                        m.startPos[1] = xBuild;
                         break;
                     case ConsoleKey.NumPad5:
                         m.map[yBuild, xBuild] = 6;
-                        m.startPos[0] = yBuild;
-                        m.startPos[1] = xBuild;
                         break;
                     case ConsoleKey.NumPad8:
                         m.map[yBuild, xBuild] = 8;
@@ -113,6 +139,7 @@ namespace MemoryTest_1
                 Console.Write(m.buildingMap.ToString());
             }
             Console.Write(m.map.ToString());
+            m.reInit();
             return m;
         }
 
@@ -161,11 +188,20 @@ namespace MemoryTest_1
 
                         for(int j = 0; j < 12; j++)
                         {
-                            m.map[i, j] = Convert.ToDouble(values[j]);
+                            double k = Convert.ToDouble(values[j]);
+                            m.map[i, j] = k;
+                            if(k == 1)
+                            {
+                                m.startPos[0] = i;
+                                m.startPos[1] = j;
+                            }
                         }
+                        i++;
                     }
                 }
             }
+            m.reInit();
+            Console.Write(m.map.ToString());
             return m;
         }
     }
