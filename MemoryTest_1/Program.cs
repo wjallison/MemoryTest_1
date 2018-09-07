@@ -16,20 +16,39 @@ namespace MemoryTest_1
             //Init the map
             TileMap m = new TileMap();
             List<Solution> trainingSolns = new List<Solution>();
+            ClassicNetwork net;
             Solution solve;
 
             Console.WriteLine("Do you want to train a classic network? (y/n)");
-            if(Console.ReadKey().KeyChar == 'y')
+            if (Console.ReadKey().KeyChar == 'y')
             {
                 List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
-                ClassicNetwork net = new ClassicNetwork(networkInit);
+                net = new ClassicNetwork(networkInit);
 
                 trainingSolns = LoadSolutions();
-                
+
+                for(int i = 0; i < trainingSolns.Count; i++)
+                {
+                    net.ConvertFromContinuous(trainingSolns[i]);
+                }
+
+                net.SGD(net.dataIn, 30, 1);
+
+                Console.WriteLine("Would you like to test the network? (y/n)");
+                if(Console.ReadKey().KeyChar == 'y')
+                {
+                    m = LoadMap();
 
 
+                }
+
+                Console.WriteLine("Would you like to save the network? (y/n)");
+                if(Console.ReadKey().KeyChar == 'y')
+                {
+                    SaveClassicNetwork(net);
+                }
             }
-            
+
 
             //Ask if the user wants to build a map
             Console.WriteLine("Do you want to build a map? (y/n)");
@@ -51,11 +70,12 @@ namespace MemoryTest_1
             if(Console.ReadKey().KeyChar == 'y')
             {
                 solve = UserSolution(m);
+                solve.FinishUp();
                 SaveSolution(solve);
             }
             else
             {
-                Console.WriteLine("Classic network? (y/n)");
+                Console.WriteLine("Do you want to load a classic network? (y/n)");
                 if(Console.ReadKey().KeyChar == 'y')
                 {
                     List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
@@ -69,15 +89,87 @@ namespace MemoryTest_1
             Console.ReadKey();
         }
 
-        public static Solution programSolution(TileMap m, ClassicNetwork net)
+        public static void SaveClassicNetwork(ClassicNetwork net)
+        {
+            Console.WriteLine("Please enter a title:");
+            string netName = Console.ReadLine();
+
+            var csv = new StringBuilder();
+            string line;
+
+            csv.AppendLine(netName);
+            csv.AppendLine(net.numLayers.ToString());
+            for(int i = 0; i < net.weights.Count; i++)
+            {
+                //csv.AppendLine(net.weights[i].RowCount.ToString() + "," + net.weights[i].ColumnCount.ToString());
+                csv.Append(net.weights[i].ToString());
+                csv.Append(net.biases[i].ToString());
+            }
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"/" + netName + ".csv", csv.ToString());
+        }
+
+        public static Solution ClassicProgramSolution(TileMap m, ClassicNetwork net, bool waitForGoAhead = true)
         {
             Solution solve = new Solution();
 
+            int xPlayer = m.startPos[0];
+            int yPlayer = m.startPos[1];
 
+            double[] action;
+            bool notDone = true;
+            while (notDone)
+            {
+                Console.Write(m.visibleMap.ToString());
+                if (waitForGoAhead) { Console.ReadKey(); }
+                action = net.Act(m);
 
+                if(action[0] == 1)
+                {
+                    solve.add(1, m.visibleMap);
+                    xPlayer--;
+                    if (m.isWall(xPlayer, yPlayer)) { xPlayer++; }
+                    m.updateVisibleMap(xPlayer, yPlayer);
+                }
+                else if (action[1] == 1)
+                {
+                    solve.add(2, m.visibleMap);
+                    xPlayer++;
+                    if (m.isWall(xPlayer, yPlayer)) { xPlayer--; }
+                    m.updateVisibleMap(xPlayer, yPlayer);
+                }
+                else if(action[2] == 1)
+                {
+                    solve.add(3, m.visibleMap);
+                    yPlayer++;
+                    if (m.isWall(xPlayer, yPlayer)) { yPlayer--; }
+                    m.updateVisibleMap(xPlayer, yPlayer);
+                }
+                else if(action[3] == 1)
+                {
+                    solve.add(4, m.visibleMap);
+                    yPlayer--;
+                    if (m.isWall(xPlayer, yPlayer)) { yPlayer++; }
+                    m.updateVisibleMap(xPlayer, yPlayer);
+                }
+                if (m.map[xPlayer, yPlayer] == 6) { notDone = false; }
+            }
+            Console.Write(m.map.ToString());
+            solve.takenSteps = solve.actions.Count;
+            Console.WriteLine("Completed in " + solve.takenSteps + " steps.");
+            Console.WriteLine("Please enter the minimum number of steps:");
+            solve.minSteps = Convert.ToInt16(Console.ReadLine());
+            solve.CalculateScore();
+            Console.WriteLine("Score (out of 1000): " + solve.score.ToString());
+
+            solve.GetName(m);
 
             return solve;
         }
+
+        //public static int InterpretAction(double[] action)
+        //{
+
+        //}
 
         public static Solution UserSolution(TileMap m)
         {
@@ -273,6 +365,7 @@ namespace MemoryTest_1
                     if (!selectedFiles[Convert.ToInt16(s)])
                     {
                         ret.Add(new Solution(files[Convert.ToInt16(s)]));
+                        selectedFiles[Convert.ToInt16(s)] = true;
                     }
                 }
                 for (int i = 0; i < files.Length; i++)

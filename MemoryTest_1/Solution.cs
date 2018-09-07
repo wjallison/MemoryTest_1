@@ -57,6 +57,11 @@ namespace MemoryTest_1
             actionsDouble.Add(convertActions(c));
             viewStates.Add(Matrix.Build.DenseOfMatrix(view));
         }
+        public void add(double c, Matrix<double> view)
+        {
+            actionsDouble.Add(c);
+            viewStates.Add(Matrix.Build.DenseOfMatrix(view));
+        }
 
         public void CalculateScore()
         {

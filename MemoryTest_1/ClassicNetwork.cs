@@ -10,27 +10,90 @@ namespace MemoryTest_1
 {
     class ClassicNetwork
     {
-        List<Matrix<double>> weights = new List<Matrix<double>>();
-        List<Matrix<double>> biases = new List<Matrix<double>>();
-        int numLayers;
+        public List<Matrix<double>> weights = new List<Matrix<double>>();
+        public List<Matrix<double>> biases = new List<Matrix<double>>();
+        public int numLayers;
+
+
+
+        public List<List<Matrix<double>>> dataIn = new List<List<Matrix<double>>>();
 
 
         public ClassicNetwork(List<int> sizes) // Example input: { 784, 30, 10 }
         {
             numLayers = sizes.Count();
-
             for (int i = 1; i < numLayers; i++)
             {
                 biases.Add(Matrix<double>.Build.Random(sizes[i], 1));
             }
-
             for (int i = 1; i < numLayers; i++)
             {
                 weights.Add(Matrix<double>.Build.Random(sizes[i], sizes[i - 1]));
             }
-
         }
 
+        public double[] Act(TileMap m)
+        {
+
+            Matrix<double> inp = Matrix<double>.Build.Dense(144, 1);
+            int counter = 0;
+            for (int i = 0; i < m.visibleMap.RowCount; i++)
+            {
+                for(int j = 0; j < m.visibleMap.ColumnCount; j++)
+                {
+                    inp[counter, 0] = m.visibleMap[i, j];
+                }
+            }
+
+            List<Matrix<double>> activations = new List<Matrix<double>>();
+            Matrix<double> activation = inp;
+            activations.Add(inp);
+            List<Matrix<double>> zs = new List<Matrix<double>>();
+
+            List<Matrix<double>> nambla_b = biases;
+            List<Matrix<double>> nambla_w = weights;
+
+            for(int i = 0; i < numLayers - 1; i++)
+            {
+                Matrix<double> z = weights[i] * activation + biases[i];
+                zs.Add(z);
+                activation = sigmoid(z);
+                activations.Add(activation);
+            }
+
+            double[] res = { 0, 0, 0, 0 };
+            int ind = 0;
+            double max = 0;
+            for(int i = 0; i < 4; i++)
+            {
+                if(activations.Last()[i,0] > max)
+                {
+                    max = activations.Last()[i, 0];
+                    ind = i;
+                }
+            }
+            res[ind] = 1.0;
+            return res;
+        }
+
+        public void ConvertFromContinuous(Solution sol)
+        {
+            for (int i = 0; i < sol.result.Count(); i++)
+            {
+                List<Matrix<double>> item = new List<Matrix<double>>();
+                List<double> op = new List<double>();
+                for(int j = 0; j < 4; j++) { op.Add(0); }
+                double[] o = op.ToArray();
+                double[,] p = new double[4, 1];
+                o[Convert.ToInt16(sol.result[i].output) - 1] = 1;
+                for(int j = 0; j < 4; j++) { p[j, 0] = o[j]; }
+                double[,] q = new double[144, 1];
+                for(int j = 0; j < 144; j++) { q[j, 0] = sol.result[i].state[j]; }
+                item.Add(Matrix.Build.DenseOfArray(q));
+                item.Add(Matrix.Build.DenseOfArray(p));
+                dataIn.Add(item);
+            }
+        }
 
         public Matrix<double> feedForward(Matrix<double> a)
         {
@@ -44,7 +107,6 @@ namespace MemoryTest_1
 
             return a;
         }
-
         public double sigmoid(double z)
         {
             return 1.0 / (1.0 + Math.Pow(2.71828, -z));
@@ -53,7 +115,6 @@ namespace MemoryTest_1
         {
             return sigmoid(z) * (1 - sigmoid(z));
         }
-
         public Matrix<double> sigmoid(Matrix<double> z)
         {
             Matrix<double> result = z;
@@ -73,7 +134,14 @@ namespace MemoryTest_1
             }
             return result;
         }
-
+        //SGD using entire set of training data
+        public void SGD(List<List<Matrix<double>>> trainingData,int iterations, double N)
+        {
+            for(int i = 0; i < iterations; i++)
+            {
+                updateMiniBatch(trainingData, N);
+            }
+        }
         public void SGD(List<List<Matrix<double>>> trainingData, int reps, int miniBatchSize,
             double N, List<Matrix<double>> testData = null)
         {
@@ -106,7 +174,6 @@ namespace MemoryTest_1
                 updateMiniBatch(miniBatches[i], N);
             }
         }
-
         public void updateMiniBatch(List<List<Matrix<double>>> miniBatch, double N)
         {
             List<Matrix<double>> nabla_b = new List<Matrix<double>>();
@@ -150,8 +217,6 @@ namespace MemoryTest_1
                 biases[i] = biases[i] - (N / miniBatch.Count()) * nabla_b[i];
             }
         }
-
-
         public List<List<Matrix<double>>> backProp(Matrix<double> x, Matrix<double> y)
         {
             List<Matrix<double>> activations = new List<Matrix<double>>();
