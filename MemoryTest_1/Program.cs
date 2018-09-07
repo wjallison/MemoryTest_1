@@ -16,7 +16,10 @@ namespace MemoryTest_1
             //Init the map
             TileMap m = new TileMap();
             List<Solution> trainingSolns = new List<Solution>();
+
             ClassicNetwork net;
+            MemoryNetwork mNet;
+
             Solution solve;
 
             Console.WriteLine("Do you want to train a classic network? (y/n)");
@@ -46,6 +49,23 @@ namespace MemoryTest_1
                 if(Console.ReadKey().KeyChar == 'y')
                 {
                     SaveClassicNetwork(net);
+                }
+            }
+            Console.WriteLine("Do you want to train a memory network? (y/n)");
+            if(Console.ReadKey().KeyChar == 'y')
+            {
+                List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+                mNet = new MemoryNetwork(networkInit, 144);
+
+                trainingSolns = LoadSolutions();
+
+                for(int i = 0; i < trainingSolns.Count; i++)
+                {
+                    for(int j = 0; j < trainingSolns[i].result.Count; j++)
+                    {
+                        mNet.Train(trainingSolns[i].result[j]);
+                    }
+                    mNet.ResetMemory();
                 }
             }
 
