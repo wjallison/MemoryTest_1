@@ -163,17 +163,24 @@ namespace MemoryTest_1
                 Console.WriteLine();
                 Console.WriteLine("Please select an option:");
                 Console.WriteLine();
-                Console.WriteLine("1. Build a map");
-                Console.WriteLine("2. Load a map");                
-                Console.WriteLine("3. Train a classic network");
-                Console.WriteLine("4. Train a memory network");
-                Console.WriteLine("5. Load a network");
-                Console.WriteLine("6. Test a network");
+                Console.WriteLine("1a. Build a map");
+                Console.WriteLine("1b. Edit a map");
+                Console.WriteLine("2. Load a map");
+                Console.WriteLine("3. Provide a solution for a map");
+                Console.WriteLine("4. Train a classic network");
+                Console.WriteLine("5. Train a memory network");
+                Console.WriteLine("6. Load a network");
+                Console.WriteLine("7. Test a network");
 
                 string choice = Console.ReadLine();
                 switch (choice)
                 {
-                    case "1":
+                    case "1a":
+                        m = NewBuildMap();
+                        SaveMap(m);
+                        mapLoaded = true;
+                        break;
+                    case "1b":
                         m = NewBuildMap(m);
                         SaveMap(m);
                         mapLoaded = true;
@@ -183,14 +190,29 @@ namespace MemoryTest_1
                         mapLoaded = true;
                         break;
                     case "3":
-                        cnet = ClassicTrainNetwork();
+                        if (!mapLoaded) { Console.WriteLine("Map not loaded!"); Console.ReadKey(); break; }
+                        solve = UserSolution(m);
+                        solve.FinishUp();
+                        SaveSolution(solve);
+                        break;
+                    case "4":
+                        Console.WriteLine("Intense? (y/n)");
+                        if(Console.ReadKey().KeyChar == 'y')
+                        {
+                            cnet = ClassicTrainNetwork(cnet, true);
+                        }
+                        else
+                        {
+                            if (cNetLoaded) { cnet = ClassicTrainNetwork(cnet); }
+                            else { cnet = ClassicTrainNetwork(); }
+                        }                        
                         cNetLoaded = true;
                         mNetLoaded = false;
                         break;
-                    case "4":
+                    case "5":
 
                         break;
-                    case "5":
+                    case "7":
                         if (!mapLoaded) { Console.WriteLine("Map not loaded!"); Console.ReadKey(); break; }
                         else if(!cNetLoaded && !mNetLoaded) { Console.WriteLine("Network not loaded!"); Console.ReadKey(); break; }
 
@@ -200,7 +222,7 @@ namespace MemoryTest_1
             }
         }
 
-        public static ClassicNetwork ClassicTrainNetwork()
+        public static ClassicNetwork ClassicTrainNetwork(bool intense = false)
         {
 
             List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
@@ -211,16 +233,41 @@ namespace MemoryTest_1
             {
                 net.ConvertFromContinuous(trainingSolns[i]);
             }
-            net.SGD(net.dataIn, 30, 1);
-
+            if (!intense)
+            {
+                net.SGD(net.dataIn, 30, 1);
+            }
+            else { net.IntenseSGD(net.dataIn, 1); }
             return net;
         }
+        public static ClassicNetwork ClassicTrainNetwork(ClassicNetwork cNet, bool intense = false)
+        {
+            List<Solution> trainingSolns = LoadSolutions();
+            for (int i = 0; i < trainingSolns.Count; i++)
+            {
+                cNet.ConvertFromContinuous(trainingSolns[i]);
+            }
+            if (!intense)
+            {
+                cNet.SGD(cNet.dataIn, 30, 1);
+            }
+            else { cNet.IntenseSGD(cNet.dataIn, 1); }
 
+            return cNet;
+        }
+
+        public static TileMap NewBuildMap()
+        {
+            TileMap m = BuildMap();
+            Console.WriteLine("Please enter a title:");
+            m.name = Console.ReadLine();
+            return m;
+        }
         public static TileMap NewBuildMap(TileMap m)
         {
             m = BuildMap(m);
-            Console.WriteLine("Please enter a title:");
-            m.name = Console.ReadLine();
+            //Console.WriteLine("Please enter a title:");
+            //m.name = Console.ReadLine();
             return m;
         }
 
@@ -274,7 +321,7 @@ namespace MemoryTest_1
             while (notDone)
             {
                 Console.Write(m.visibleMap.ToString());
-                if (waitForGoAhead) { Console.ReadKey(); }
+                if (waitForGoAhead) { if (Console.ReadKey().Key == ConsoleKey.Escape) { break; } }
                 action = net.Act(m);
 
                 if(action[0] == 1)
@@ -378,11 +425,6 @@ namespace MemoryTest_1
             return solve;
         }
 
-        //public static int InterpretAction(double[] action)
-        //{
-
-        //}
-
         public static Solution UserSolution(TileMap m)
         {
             Solution solve = new Solution();
@@ -434,7 +476,61 @@ namespace MemoryTest_1
 
             return solve;
         }
-
+        public static TileMap BuildMap()
+        {
+            TileMap m = new TileMap();
+            int xBuild = 0;
+            int yBuild = 0;
+            bool t = true;
+            Console.Write(m.buildingMap.ToString());
+            while (t)
+            {
+                ConsoleKeyInfo c = Console.ReadKey();
+                switch (c.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        yBuild--;
+                        m.buildingMap = Matrix.Build.DenseOfMatrix(m.map);
+                        //m.buildingMap = m.map;
+                        m.buildingMap[yBuild, xBuild] = 5;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        yBuild++;
+                        m.buildingMap = Matrix.Build.DenseOfMatrix(m.map);
+                        m.buildingMap[yBuild, xBuild] = 5;
+                        break;
+                    case ConsoleKey.RightArrow:
+                        xBuild++;
+                        m.buildingMap = Matrix.Build.DenseOfMatrix(m.map);
+                        m.buildingMap[yBuild, xBuild] = 5;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        xBuild--;
+                        m.buildingMap = Matrix.Build.DenseOfMatrix(m.map);
+                        m.buildingMap[yBuild, xBuild] = 5;
+                        break;
+                    case ConsoleKey.NumPad0:
+                        m.map[yBuild, xBuild] = 1;
+                        m.startPos[0] = yBuild;
+                        m.startPos[1] = xBuild;
+                        break;
+                    case ConsoleKey.NumPad5:
+                        m.map[yBuild, xBuild] = 6;
+                        break;
+                    case ConsoleKey.NumPad8:
+                        m.map[yBuild, xBuild] = 8;
+                        break;
+                    case ConsoleKey.Escape:
+                        t = false;
+                        break;
+                }
+                Console.Clear();
+                Console.Write(m.buildingMap.ToString());
+            }
+            Console.Write(m.map.ToString());
+            m.reInit();
+            return m;
+        }
         public static TileMap BuildMap(TileMap m)
         {
             //Allow the user to build the map
@@ -566,7 +662,7 @@ namespace MemoryTest_1
             List<bool> selectedFiles = new List<bool>();
             for(int i = 0; i < files.Length; i++) { selectedFiles.Add(false); }
 
-            Console.WriteLine("Please select solutions to use for training.");
+            Console.WriteLine("Please select solutions to use for training. 'A' for all.");
             for(int i = 0; i < files.Length; i++)
             {
                 Console.WriteLine(" " + i.ToString() + ". " + files[i].Name);
@@ -578,6 +674,14 @@ namespace MemoryTest_1
                 if(s == "") { notDone = false; }
                 else
                 {
+                    if(s == "A")
+                    {
+                        for(int i = 0; i < selectedFiles.Count; i++) {
+                            ret.Add(new Solution(files[i]));
+                            selectedFiles[i] = true; }
+                        notDone = false;
+                        break;
+                    }
                     if (!selectedFiles[Convert.ToInt16(s)])
                     {
                         ret.Add(new Solution(files[Convert.ToInt16(s)]));

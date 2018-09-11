@@ -14,8 +14,6 @@ namespace MemoryTest_1
         public List<Matrix<double>> biases = new List<Matrix<double>>();
         public int numLayers;
 
-
-
         public List<List<Matrix<double>>> dataIn = new List<List<Matrix<double>>>();
 
 
@@ -32,6 +30,49 @@ namespace MemoryTest_1
             }
         }
 
+        public double[] Act(Matrix<double> visM)
+        {
+            Matrix<double> inp = Matrix<double>.Build.Dense(144, 1);
+            int counter = 0;
+            for (int i = 0; i < visM.RowCount; i++)
+            {
+                for (int j = 0; j < visM.ColumnCount; j++)
+                {
+                    inp[counter, 0] = visM[i, j];
+                    counter++;
+                }
+            }
+
+            List<Matrix<double>> activations = new List<Matrix<double>>();
+            Matrix<double> activation = inp;
+            activations.Add(inp);
+            List<Matrix<double>> zs = new List<Matrix<double>>();
+
+            List<Matrix<double>> nambla_b = biases;
+            List<Matrix<double>> nambla_w = weights;
+
+            for (int i = 0; i < numLayers - 1; i++)
+            {
+                Matrix<double> z = weights[i] * activation + biases[i];
+                zs.Add(z);
+                activation = sigmoid(z);
+                activations.Add(activation);
+            }
+
+            double[] res = { 0, 0, 0, 0 };
+            int ind = 0;
+            double max = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                if (activations.Last()[i, 0] > max)
+                {
+                    max = activations.Last()[i, 0];
+                    ind = i;
+                }
+            }
+            res[ind] = 1.0;
+            return res;
+        }
         public double[] Act(TileMap m)
         {
 
@@ -42,6 +83,7 @@ namespace MemoryTest_1
                 for(int j = 0; j < m.visibleMap.ColumnCount; j++)
                 {
                     inp[counter, 0] = m.visibleMap[i, j];
+                    counter++;
                 }
             }
 
@@ -135,6 +177,34 @@ namespace MemoryTest_1
             return result;
         }
         //SGD using entire set of training data
+        public void IntenseSGD(List<List<Matrix<double>>> trainingData, double N)
+        {
+            int right = 0;
+            double fractionRight = 0;
+            while(fractionRight <= 0.5)
+            {
+                updateMiniBatch(trainingData, N);
+
+                right = 0;
+                for(int i = 0; i < trainingData.Count; i++)
+                {
+                    bool point = true;
+                    double[] res = Act(trainingData[i][0]);
+                    for (int j = 0; j < 4; j++)
+                    {
+                        if(res[j] != trainingData[i][1][j, 0])
+                        {
+                            point = false;
+                        }
+                    }
+                    if (point)
+                    {
+                        right++;
+                    }
+                }
+                fractionRight = Convert.ToDouble(right) / Convert.ToDouble(trainingData.Count);
+            }
+        }
         public void SGD(List<List<Matrix<double>>> trainingData,int iterations, double N)
         {
             for(int i = 0; i < iterations; i++)

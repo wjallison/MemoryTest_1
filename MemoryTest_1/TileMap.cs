@@ -73,7 +73,7 @@ namespace MemoryTest_1
                 }
             }
 
-            visibleMap[x, y] = 1;
+            visibleMap[x, y] = 2;
         }
     }
 }
