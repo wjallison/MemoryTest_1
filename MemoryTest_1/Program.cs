@@ -13,122 +13,217 @@ namespace MemoryTest_1
     {
         static void Main(string[] args)
         {
-            //Init the map
+            altMain();
+            
+            ////Init the map
+            //TileMap m = new TileMap();
+            //List<Solution> trainingSolns = new List<Solution>();
+
+            //ClassicNetwork net;
+            //MemoryNetwork mNet;
+
+            //Solution solve;
+
+            //Console.WriteLine("Do you want to train a classic network? (y/n)");
+            //if (Console.ReadKey().KeyChar == 'y')
+            //{
+            //    List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+            //    net = new ClassicNetwork(networkInit);
+
+            //    trainingSolns = LoadSolutions();
+
+            //    for(int i = 0; i < trainingSolns.Count; i++)
+            //    {
+            //        net.ConvertFromContinuous(trainingSolns[i]);
+            //    }
+
+            //    net.SGD(net.dataIn, 30, 1);
+
+            //    Console.WriteLine("Would you like to test the network? (y/n)");
+            //    if(Console.ReadKey().KeyChar == 'y')
+            //    {
+            //        m = LoadMap();
+
+            //        ClassicProgramSolution(m, net);
+            //    }
+
+            //    Console.WriteLine("Would you like to save the network? (y/n)");
+            //    if(Console.ReadKey().KeyChar == 'y')
+            //    {
+            //        SaveClassicNetwork(net);
+            //    }
+            //}
+
+            //Console.WriteLine("Do you want to train a memory network? (y/n)");
+            //if(Console.ReadKey().KeyChar == 'y')
+            //{
+            //    List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+            //    mNet = new MemoryNetwork(networkInit, 144);
+
+            //    trainingSolns = LoadSolutions();
+
+            //    for(int i = 0; i < trainingSolns.Count; i++)
+            //    {
+            //        for(int j = 0; j < trainingSolns[i].result.Count; j++)
+            //        {
+            //            mNet.Train(trainingSolns[i].result[j]);
+            //        }
+            //        mNet.ResetMemory();
+            //    }
+
+            //    Console.WriteLine("Would you like to test the network? (y/n)");
+            //    if (Console.ReadKey().KeyChar == 'y')
+            //    {
+            //        m = LoadMap();
+
+                    
+            //    }
+
+            //    Console.WriteLine("Would you like to save the network? (y/n)");
+            //    if (Console.ReadKey().KeyChar == 'y')
+            //    {
+                    
+            //    }
+            //}
+
+            //Console.WriteLine("Do you want to build a map? (y/n)");
+            //if(Console.ReadKey().KeyChar == 'y')
+            //{
+            //    m = BuildMap(m);
+            //    Console.WriteLine("Please enter a title:");
+            //    m.name = Console.ReadLine();
+            //    SaveMap(m);
+            //}
+            //else
+            //{
+            //    m = LoadMap();
+            //}
+            ////Console.WriteLine")
+
+            ////One way or another, we now have a map.  Now, we will choose who will solve the map.
+            //Console.WriteLine("Will the solution be provided by the user? (y/n)");
+            //if(Console.ReadKey().KeyChar == 'y')
+            //{
+            //    solve = UserSolution(m);
+            //    solve.FinishUp();
+            //    SaveSolution(solve);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Do you want to load a classic network? (y/n)");
+            //    if(Console.ReadKey().KeyChar == 'y')
+            //    {
+            //        List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("Do you want to load a memory network? (y/n)");
+            //        if(Console.ReadKey().KeyChar == 'y')
+            //        {
+
+
+            //        }
+            //    }
+
+            //}
+            
+
+            //Console.ReadKey();
+        }
+
+        public static void altMain()
+        {
             TileMap m = new TileMap();
             List<Solution> trainingSolns = new List<Solution>();
 
-            ClassicNetwork net;
+            List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+            ClassicNetwork cnet = new ClassicNetwork(networkInit);
             MemoryNetwork mNet;
 
             Solution solve;
+            //Console.cl
+            bool mapLoaded = false;
+            bool cNetLoaded = false;
+            bool mNetLoaded = false;
+            bool solnsLoaded = false;
 
-            Console.WriteLine("Do you want to train a classic network? (y/n)");
-            if (Console.ReadKey().KeyChar == 'y')
+            while (true)
             {
-                List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
-                net = new ClassicNetwork(networkInit);
+                Console.Clear();
+                if (mapLoaded) { Console.WriteLine("Map loaded: " + m.name); }
+                else { Console.WriteLine("Map loaded: FALSE"); }
+                Console.Write("Classic network loaded: ");
+                if (cNetLoaded) { Console.WriteLine("TRUE"); }
+                else { Console.WriteLine("FALSE"); }
+                Console.Write("Memory network loaded: ");
+                if (mNetLoaded) { Console.WriteLine("TRUE"); }
+                else { Console.WriteLine("FALSE"); }
+                //Console.Write("Solutions ")
+                Console.WriteLine();
+                Console.WriteLine("Please select an option:");
+                Console.WriteLine();
+                Console.WriteLine("1. Build a map");
+                Console.WriteLine("2. Load a map");                
+                Console.WriteLine("3. Train a classic network");
+                Console.WriteLine("4. Train a memory network");
+                Console.WriteLine("5. Load a network");
+                Console.WriteLine("6. Test a network");
 
-                trainingSolns = LoadSolutions();
-
-                for(int i = 0; i < trainingSolns.Count; i++)
+                string choice = Console.ReadLine();
+                switch (choice)
                 {
-                    net.ConvertFromContinuous(trainingSolns[i]);
-                }
+                    case "1":
+                        m = NewBuildMap(m);
+                        SaveMap(m);
+                        mapLoaded = true;
+                        break;
+                    case "2":
+                        m = LoadMap();
+                        mapLoaded = true;
+                        break;
+                    case "3":
+                        cnet = ClassicTrainNetwork();
+                        cNetLoaded = true;
+                        mNetLoaded = false;
+                        break;
+                    case "4":
 
-                net.SGD(net.dataIn, 30, 1);
+                        break;
+                    case "5":
+                        if (!mapLoaded) { Console.WriteLine("Map not loaded!"); Console.ReadKey(); break; }
+                        else if(!cNetLoaded && !mNetLoaded) { Console.WriteLine("Network not loaded!"); Console.ReadKey(); break; }
 
-                Console.WriteLine("Would you like to test the network? (y/n)");
-                if(Console.ReadKey().KeyChar == 'y')
-                {
-                    m = LoadMap();
-
-
-                }
-
-                Console.WriteLine("Would you like to save the network? (y/n)");
-                if(Console.ReadKey().KeyChar == 'y')
-                {
-                    SaveClassicNetwork(net);
+                        ClassicProgramSolution(m, cnet);
+                        break;
                 }
             }
-
-            Console.WriteLine("Do you want to train a memory network? (y/n)");
-            if(Console.ReadKey().KeyChar == 'y')
-            {
-                List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
-                mNet = new MemoryNetwork(networkInit, 144);
-
-                trainingSolns = LoadSolutions();
-
-                for(int i = 0; i < trainingSolns.Count; i++)
-                {
-                    for(int j = 0; j < trainingSolns[i].result.Count; j++)
-                    {
-                        mNet.Train(trainingSolns[i].result[j]);
-                    }
-                    mNet.ResetMemory();
-                }
-
-                Console.WriteLine("Would you like to test the network? (y/n)");
-                if (Console.ReadKey().KeyChar == 'y')
-                {
-                    m = LoadMap();
-
-
-                }
-
-                Console.WriteLine("Would you like to save the network? (y/n)");
-                if (Console.ReadKey().KeyChar == 'y')
-                {
-                    
-                }
-            }
-
-            Console.WriteLine("Do you want to build a map? (y/n)");
-            if(Console.ReadKey().KeyChar == 'y')
-            {
-                m = BuildMap(m);
-                Console.WriteLine("Please enter a title:");
-                m.name = Console.ReadLine();
-                SaveMap(m);
-            }
-            else
-            {
-                m = LoadMap();
-            }
-            //Console.WriteLine")
-
-            //One way or another, we now have a map.  Now, we will choose who will solve the map.
-            Console.WriteLine("Will the solution be provided by the user? (y/n)");
-            if(Console.ReadKey().KeyChar == 'y')
-            {
-                solve = UserSolution(m);
-                solve.FinishUp();
-                SaveSolution(solve);
-            }
-            else
-            {
-                Console.WriteLine("Do you want to load a classic network? (y/n)");
-                if(Console.ReadKey().KeyChar == 'y')
-                {
-                    List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
-
-                }
-                else
-                {
-                    Console.WriteLine("Do you want to load a memory network? (y/n)");
-                    if(Console.ReadKey().KeyChar == 'y')
-                    {
-
-
-                    }
-                }
-
-            }
-            
-
-            Console.ReadKey();
         }
+
+        public static ClassicNetwork ClassicTrainNetwork()
+        {
+
+            List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+            ClassicNetwork net = new ClassicNetwork(networkInit);
+
+            List<Solution> trainingSolns = LoadSolutions();
+            for(int i = 0; i < trainingSolns.Count; i++)
+            {
+                net.ConvertFromContinuous(trainingSolns[i]);
+            }
+            net.SGD(net.dataIn, 30, 1);
+
+            return net;
+        }
+
+        public static TileMap NewBuildMap(TileMap m)
+        {
+            m = BuildMap(m);
+            Console.WriteLine("Please enter a title:");
+            m.name = Console.ReadLine();
+            return m;
+        }
+
         public static void SaveMemoryNetwork(MemoryNetwork net)
         {
             Console.WriteLine("Please enter a title:");
@@ -388,6 +483,7 @@ namespace MemoryTest_1
                         t = false;
                         break;
                 }
+                Console.Clear();
                 Console.Write(m.buildingMap.ToString());
             }
             Console.Write(m.map.ToString());
@@ -413,7 +509,7 @@ namespace MemoryTest_1
                 csv.AppendLine(line);
             }
 
-            File.WriteAllText(Directory.GetCurrentDirectory() + @"/" + m.name + ".csv", csv.ToString());
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"/map_" + m.name + ".csv", csv.ToString());
         }
 
         public static TileMap LoadMap()
@@ -421,7 +517,10 @@ namespace MemoryTest_1
             TileMap m = new TileMap();
 
             DirectoryInfo dInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
-            FileInfo[] files = dInfo.GetFiles("*.csv");
+            //System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex(@"^^(?!soln_|cnet_|mnet_).*");
+            //FileInfo[] files = dInfo.GetFiles("*.csv").Where(path => r.IsMatch(path));
+            FileInfo[] files = dInfo.GetFiles("map_*.csv");
+            //files = files.Where(x => x.Name.Contains("soln_")).ToArray();
 
             Console.WriteLine("Please choose the map you wish to load.");
             for(int i = 0; i < files.Length; i++) 
