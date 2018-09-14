@@ -137,7 +137,7 @@ namespace MemoryTest_1
             TileMap m = new TileMap();
             List<Solution> trainingSolns = new List<Solution>();
 
-            List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+            List<int> networkInit = new List<int> { 12 * 12 * 3, 30, 4 };
             ClassicNetwork cnet = new ClassicNetwork(networkInit);
             MemoryNetwork mNet;
 
@@ -225,7 +225,7 @@ namespace MemoryTest_1
         public static ClassicNetwork ClassicTrainNetwork(bool intense = false)
         {
 
-            List<int> networkInit = new List<int> { 12 * 12, 30, 4 };
+            List<int> networkInit = new List<int> { 12 * 12 * 3, 30, 4 };
             ClassicNetwork net = new ClassicNetwork(networkInit);
 
             List<Solution> trainingSolns = LoadSolutions();
@@ -701,8 +701,11 @@ namespace MemoryTest_1
                 }
 
             }
-
-
+            for(int i = 0; i < ret.Count; i++)
+            {
+                ret[i].ProcessExpanded();
+            }
+            
             return ret;
         }
         

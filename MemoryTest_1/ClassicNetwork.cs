@@ -30,18 +30,69 @@ namespace MemoryTest_1
             }
         }
 
-        public double[] Act(Matrix<double> visM)
+        public Matrix<double> Expand(Matrix<double> visM)
         {
-            Matrix<double> inp = Matrix<double>.Build.Dense(144, 1);
+            Matrix<double> inp = Matrix<double>.Build.Dense(12 * 12 * 3, 1);
             int counter = 0;
-            for (int i = 0; i < visM.RowCount; i++)
+            for(int i = 0; i < visM.RowCount; i++)
             {
                 for (int j = 0; j < visM.ColumnCount; j++)
                 {
-                    inp[counter, 0] = visM[i, j];
+                    //inp[counter, 0] = visM[i, j];
+                    switch (visM[i, j])
+                    {
+                        case 0:
+                            inp[counter, 0] = 0;//position
+                            inp[counter + 144, 0] = 0;//walls
+                            inp[counter + 288, 0] = 0;//endPosition
+                            break;
+                        case 9:
+                            inp[counter, 0] = .5;
+                            inp[counter + 144, 0] = .5;
+                            inp[counter + 288, 0] = .5;
+                            break;
+                        case 1:
+                            inp[counter, 0] = 0;//position
+                            inp[counter + 144, 0] = 0;//walls
+                            inp[counter + 288, 0] = 0;//endPosition
+                            break;
+                        case 2:
+                            inp[counter, 0] = 1;//position
+                            inp[counter + 144, 0] = 0;//walls
+                            inp[counter + 288, 0] = 0;//endPosition
+                            break;
+                        case 6:
+                            inp[counter, 0] = 0;//position
+                            inp[counter + 144, 0] = 0;//walls
+                            inp[counter + 288, 0] = 1;//endPosition
+                            break;
+                        case 8:
+                            inp[counter, 0] = 0;//position
+                            inp[counter + 144, 0] = 1;//walls
+                            inp[counter + 288, 0] = 0;//endPosition
+                            break;
+                    }
                     counter++;
                 }
             }
+            return inp;
+        }
+
+        public double[] Act(Matrix<double> visM)
+        {
+            //Matrix<double> inp = Matrix<double>.Build.Dense(12 * 12 * 3, 1);
+            //int counter = 0;
+            //for (int i = 0; i < visM.RowCount; i++)
+            //{
+            //    for (int j = 0; j < visM.ColumnCount; j++)
+            //    {
+            //        //inp[counter, 0] = visM[i, j];
+
+            //        counter++;
+            //    }
+            //}
+
+            Matrix<double> inp = Expand(visM);
 
             List<Matrix<double>> activations = new List<Matrix<double>>();
             Matrix<double> activation = inp;
@@ -73,19 +124,56 @@ namespace MemoryTest_1
             res[ind] = 1.0;
             return res;
         }
+
+        //public double[] Act(Matrix<double> visM)
+        //{
+        //    Matrix<double> inp = Matrix<double>.Build.Dense(12 * 12 * 3, 1);
+        //    int counter = 0;
+        //    for (int i = 0; i < visM.RowCount; i++)
+        //    {
+        //        for (int j = 0; j < visM.ColumnCount; j++)
+        //        {
+        //            inp[counter, 0] = visM[i, j];
+        //            counter++;
+        //        }
+        //    }
+
+        //    List<Matrix<double>> activations = new List<Matrix<double>>();
+        //    Matrix<double> activation = inp;
+        //    activations.Add(inp);
+        //    List<Matrix<double>> zs = new List<Matrix<double>>();
+
+        //    List<Matrix<double>> nambla_b = biases;
+        //    List<Matrix<double>> nambla_w = weights;
+
+        //    for (int i = 0; i < numLayers - 1; i++)
+        //    {
+        //        Matrix<double> z = weights[i] * activation + biases[i];
+        //        zs.Add(z);
+        //        activation = sigmoid(z);
+        //        activations.Add(activation);
+        //    }
+
+        //    double[] res = { 0, 0, 0, 0 };
+        //    int ind = 0;
+        //    double max = 0;
+        //    for (int i = 0; i < 4; i++)
+        //    {
+        //        if (activations.Last()[i, 0] > max)
+        //        {
+        //            max = activations.Last()[i, 0];
+        //            ind = i;
+        //        }
+        //    }
+        //    res[ind] = 1.0;
+        //    return res;
+        //}
         public double[] Act(TileMap m)
         {
 
-            Matrix<double> inp = Matrix<double>.Build.Dense(144, 1);
-            int counter = 0;
-            for (int i = 0; i < m.visibleMap.RowCount; i++)
-            {
-                for(int j = 0; j < m.visibleMap.ColumnCount; j++)
-                {
-                    inp[counter, 0] = m.visibleMap[i, j];
-                    counter++;
-                }
-            }
+            Matrix<double> inp = Expand(m.visibleMap);
+                //Matrix<double>.Build.Dense(12 * 12 * 3, 1);
+            
 
             List<Matrix<double>> activations = new List<Matrix<double>>();
             Matrix<double> activation = inp;
@@ -129,9 +217,14 @@ namespace MemoryTest_1
                 double[,] p = new double[4, 1];
                 o[Convert.ToInt16(sol.result[i].output) - 1] = 1;
                 for(int j = 0; j < 4; j++) { p[j, 0] = o[j]; }
-                double[,] q = new double[144, 1];
-                for(int j = 0; j < 144; j++) { q[j, 0] = sol.result[i].state[j]; }
-                item.Add(Matrix.Build.DenseOfArray(q));
+                //double[,] q = new double[144, 1];
+                //for(int j = 0; j < 144; j++) { q[j, 0] = sol.result[i].state[j]; }
+                //item.Add(Matrix.Build.DenseOfArray(q));
+                Matrix<double> q = Matrix.Build.Dense(12 * 12 * 3, 1);
+                for(int j = 0; j < q.RowCount; j++)
+                {
+                    q[j, 0] = sol.expandedResult[i].combinedState[j];
+                }
                 item.Add(Matrix.Build.DenseOfArray(p));
                 dataIn.Add(item);
             }

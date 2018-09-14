@@ -20,7 +20,8 @@ namespace MemoryTest_1
         public List<double> actionsDouble = new List<double>();
         public List<Matrix<double>> viewStates = new List<Matrix<double>>();
 
-        public List<SingleTraining> result = new List<SingleTraining>(); 
+        public List<SingleTraining> result = new List<SingleTraining>();
+        public List<ExpandedTraining> expandedResult = new List<ExpandedTraining>();
 
         //public double[] 
         //public Matrix<double> 
@@ -29,6 +30,75 @@ namespace MemoryTest_1
         public Solution()
         {
             //actions.Add(null);
+        }
+
+       
+
+        public void ProcessExpanded()
+        {
+            for (int i = 0; i < result.Count; i++)
+            {
+                List<double> pos = new List<double>();
+                List<double> walls = new List<double>();
+                List<double> endPos = new List<double>();
+                List<double> combined = new List<double>();
+                for (int j = 0; j < result[0].state.Count; j++)
+                {
+
+                    switch (result[i].state[j])
+                    {
+                        case 0:
+                            pos.Add(0);
+                            walls.Add(0);
+                            endPos.Add(0);
+                            break;
+                        case 9:
+                            pos.Add(.5);
+                            walls.Add(.5);
+                            endPos.Add(.5);
+                            break;
+                        case 1:
+                            pos.Add(0);
+                            walls.Add(0);
+                            endPos.Add(0);
+                            break;
+                        case 2:
+                            pos.Add(1);
+                            walls.Add(0);
+                            endPos.Add(0);
+                            break;
+                        case 6:
+                            pos.Add(0);
+                            walls.Add(0);
+                            endPos.Add(1);
+                            break;
+                        case 8:
+                            pos.Add(0);
+                            walls.Add(1);
+                            endPos.Add(0);
+                            break;
+                    }
+                }
+                for(int j = 0; j < 3; j++)
+                {
+                    for(int k = 0; k < pos.Count; k++)
+                    {
+                        switch (j)
+                        {
+                            case 0:
+                                combined.Add(pos[k]);
+                                break;
+                            case 1:
+                                combined.Add(walls[k]);
+                                break;
+                            case 2:
+                                combined.Add(endPos[k]);
+                                break;
+                        }
+                    }
+                }
+                expandedResult.Add(new ExpandedTraining(pos, walls, endPos, combined, result[i].output, result[i].score));
+            }
         }
 
         public Solution(FileInfo f)
@@ -133,6 +203,26 @@ namespace MemoryTest_1
             Console.WriteLine("Please enter a name for the solution:");
             Console.Write(m.name + " + ");
             name = m.name + Console.ReadLine();
+        }
+    }
+
+    public struct ExpandedTraining
+    {
+        public List<double> statePosition;
+        public List<double> stateWalls;
+        public List<double> stateEndPos;
+        public List<double> combinedState;
+        public double output;
+        public double score;
+
+        public ExpandedTraining(List<double> staP, List<double> staW, List<double> staEnd, List<double> comb, double ou, double sco)
+        {
+            statePosition = staP;
+            stateWalls = staW;
+            stateEndPos = staEnd;
+            combinedState = comb;
+            output = ou;
+            score = sco;
         }
     }
 
